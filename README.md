@@ -1,4 +1,4 @@
-
+# Process Update
 The infrastructure components Kubernetes/OpenShift manifests, are located here https://github.com/SvetlanaGlad/ocp-guestbook-infra.
 
 Current Status: Integration with OpenShift is currently in progress. Some deployment features may not function correctly at this stage. I am actively working on resolving technical challenges (such as SCC permissions, route configurations, and persistent storage) and aim to have a stable production-ready setup by the end of this week.
