@@ -8,10 +8,15 @@ env:
   REGISTRY: ghcr.io
   IMAGE_BACKEND: guestbook-api
   IMAGE_FRONTEND: guestbook-web
+  IMAGE_TAG: ""
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
 
     steps:
 
@@ -19,28 +24,40 @@ jobs:
       uses: actions/checkout@v4
 
    
-    - name: Set IMAGE_TAG
-      run: echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+    - name: Set IMAGE_TAG and Lowercase Repo 
+      run: |
+        echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        echo "REPO_LOWER=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
 
-   
+    - name: Setup Node and Lint Frontend
+      uses: actions/setup-node@v4
+      with:
+        node-version: "24"
+
+    - name: Install HTMLHint
+      run: npm install -g htmlhint
+
+    - name: Run frontend lint
+      working-directory: ./frontend
+      run: make lint
+
+
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: 1.25
 
-    
     - name: Verify Go modules
       run: |
         cd backend
         go mod verify
-
-    
+  
     - name: Test backend
       run: |
         cd backend
         make test || go test ./...
 
-    
+  
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -53,21 +70,16 @@ jobs:
     - name: Build frontend image
       run: |
         docker build -t guestbook-web:${IMAGE_TAG} ./frontend
-
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+  
+    - name: Scan Backend with Trivy
+      uses: aquasecurity/trivy-action@master
       with:
-        node-version: "24"
+        image-ref: guestbook-api:${{ env.IMAGE_TAG }}
+        format: 'table'
+        exit-code: '1' 
+        severity: 'CRITICAL,HIGH'
 
-    - name: Install HTMLHint
-      run: npm install -g htmlhint
 
-    - name: Run frontend lint
-      working-directory: ./frontend
-      run: make lint
-
-    
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v3
       with:
@@ -78,11 +90,11 @@ jobs:
     
     - name: Push backend image
       run: |
-        docker tag guestbook-api:${IMAGE_TAG} ${{ env.REGISTRY }}/svetlanaglad/guestbook-api:${IMAGE_TAG}
-        docker push ${{ env.REGISTRY }}/svetlanaglad/guestbook-api:${IMAGE_TAG}
+        docker tag guestbook-api:${{ env.IMAGE_TAG }} ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/guestbook-api:${{ env.IMAGE_TAG }}
+        docker push ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/guestbook-api:${{ env.IMAGE_TAG }}
 
     - name: Push frontend image
       run: |
-        docker tag guestbook-web:${IMAGE_TAG} ${{ env.REGISTRY }}/svetlanaglad/guestbook-web:${IMAGE_TAG}
-        docker push ${{ env.REGISTRY }}/svetlanaglad/guestbook-web:${IMAGE_TAG}
+        docker tag guestbook-web:${{ env.IMAGE_TAG }} ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/guestbook-web:${{ env.IMAGE_TAG }}
+        docker push ${{ env.REGISTRY }}/${{ env.REPO_LOWER }}/guestbook-web:${{ env.IMAGE_TAG }}
 
