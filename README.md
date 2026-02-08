@@ -1,3 +1,9 @@
+
+The infrastructure components Kubernetes/OpenShift manifests, are located here https://github.com/SvetlanaGlad/ocp-guestbook-infra.
+
+Current Status: Integration with OpenShift is currently in progress. Some deployment features may not function correctly at this stage. I am actively working on resolving technical challenges (such as SCC permissions, route configurations, and persistent storage) and aim to have a stable production-ready setup by the end of this week.
+
+
 # OpenShift: Distribuerad Gästbok med cache
 
 I denna labb ska ni bygga och deploya en modern, cloud-native applikation på OpenShift. Applikationen är en gästbok som demonstrerar:
