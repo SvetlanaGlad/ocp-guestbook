@@ -1,0 +1,7 @@
+FROM quay.io/kurs/redis:latest
+
+VOLUME /data
+
+EXPOSE 6379
+
+CMD ["redis-server", "--appendonly", "yes", "--dir", "/data"]

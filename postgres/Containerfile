@@ -1,0 +1,9 @@
+FROM quay.io/fedora/postgresql-16:latest
+
+ENV POSTGRES_USER=guestbook
+ENV POSTGRES_PASSWORD=password
+ENV POSTGRES_DB=guestbook
+
+VOLUME /var/lib/pgsql/data
+
+EXPOSE 5432
