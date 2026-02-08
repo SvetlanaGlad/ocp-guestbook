@@ -78,11 +78,11 @@ jobs:
     
     - name: Push backend image
       run: |
-        docker tag guestbook-api:${IMAGE_TAG} ghcr.io/${{ github.repository_owner }}/guestbook-api:${IMAGE_TAG}
-        docker push ghcr.io/${{ github.repository_owner }}/guestbook-api:${IMAGE_TAG}
+        docker tag guestbook-api:${IMAGE_TAG} ${{ env.REGISTRY }}/svetlanaglad/guestbook-api:${IMAGE_TAG}
+        docker push ${{ env.REGISTRY }}/svetlanaglad/guestbook-api:${IMAGE_TAG}
 
-    
     - name: Push frontend image
       run: |
-        docker tag guestbook-web:${IMAGE_TAG} ghcr.io/${{ github.repository_owner }}/guestbook-web:${IMAGE_TAG}
-        docker push ghcr.io/${{ github.repository_owner }}/guestbook-web:${IMAGE_TAG}
+        docker tag guestbook-web:${IMAGE_TAG} ${{ env.REGISTRY }}/svetlanaglad/guestbook-web:${IMAGE_TAG}
+        docker push ${{ env.REGISTRY }}/svetlanaglad/guestbook-web:${IMAGE_TAG}
+
